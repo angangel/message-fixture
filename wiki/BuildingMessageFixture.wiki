@@ -1,0 +1,9 @@
+#summary Building message-fixture
+
+= Maven setup =
+
+message-fixture needs some JARs not available on public repositories. So, to build you need to upload the following JARs to your local repository. You would normally find these JARs with your WMQ installation.
+
+TODO: fill in list of JARs
+ 
+ 
