@@ -102,6 +102,7 @@ public class JMSService {
 		return sendInternal(destinationName, message);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public int count(String destinationName, String selector) throws JMSException {
 		Connection conn = null;
 		Session session = null;
