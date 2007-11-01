@@ -1,6 +1,8 @@
 package com.googlecode.messagefixture.jms;
 
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -13,40 +15,40 @@ import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 
+import net.servicefixture.ServiceFixtureException;
 
+import org.apache.commons.beanutils.BeanUtils;
+
+import com.googlecode.messagefixture.AbstractMessageService;
+import com.googlecode.messagefixture.MessageConfiguration;
 import com.googlecode.messagefixture.jms.templates.MessageTemplate;
 import com.googlecode.messagefixture.jms.templates.MessageTemplateFactory;
 import com.googlecode.messagefixture.jms.templates.TextMessageTemplate;
-import com.ibm.mq.jms.MQConnectionFactory;
-import com.ibm.mq.jms.MQQueue;
 
-public class JMSService {
+public class JMSService extends AbstractMessageService {
 
-	private ConnectionFactory createConnectionFactory() throws JMSException {
-		MQConnectionFactory cf = new MQConnectionFactory();
-		cf.setQueueManager("QM1");
-		
-		return cf;
-	}
-	
-	private Destination createDestination(String destinationName) throws JMSException {
-		return new MQQueue(destinationName);
+	private Destination createDestination(Session session, String destinationName) throws JMSException {
+		return session.createQueue(destinationName);
 	}
 	
 	public MessageTemplate receive(String destinationName, String selector) throws JMSException {
+		return receive(destinationName, selector, null);
+	}
+	
+	public MessageTemplate receive(String destinationName, String selector, String connName) throws JMSException {
 		Connection conn = null;
 		Session session = null;
 		MessageConsumer consumer = null;
 
 		try {
-			conn = createConnectionFactory().createConnection();
+			conn = createConnectionFactory(connName).createConnection();
 			conn.start();
 			session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			
 			if(selector != null) {
-				consumer = session.createConsumer(createDestination(destinationName), selector);
+				consumer = session.createConsumer(createDestination(session, destinationName), selector);
 			} else {
-				consumer = session.createConsumer(createDestination(destinationName));
+				consumer = session.createConsumer(createDestination(session, destinationName));
 			}
 			
 			Message jmsMessage = consumer.receive(10000);
@@ -65,17 +67,17 @@ public class JMSService {
 		
 	}
 
-	private MessageTemplate sendInternal(String destinationName, MessageTemplate message) throws JMSException {
+	private MessageTemplate sendInternal(String connName, String destinationName, MessageTemplate message) throws JMSException {
 		Connection conn = null;
 		Session session = null;
 		MessageProducer producer = null;
 
 		
 		try {
-			conn = createConnectionFactory().createConnection();
+			conn = createConnectionFactory(connName).createConnection();
 			session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			
-			producer = session.createProducer(createDestination(destinationName));
+			producer = session.createProducer(createDestination(session, destinationName));
 			
 			Message jmsMessage = message.toMessage(session); 
 			producer.send(jmsMessage);
@@ -88,35 +90,35 @@ public class JMSService {
 		}
 	}
 	
-	public MessageTemplate send(String destinationName, MessageTemplate message) throws JMSException {
+	public MessageTemplate send(String destinationName, MessageTemplate message, String connName) throws JMSException {
 		if(message == null) {
 			message = new MessageTemplate();
 		}
-		return sendInternal(destinationName, message);
+		return sendInternal(connName, destinationName, message);
 	}
 
-	public MessageTemplate sendText(String destinationName, TextMessageTemplate message) throws JMSException {
+	public MessageTemplate sendText(String destinationName, TextMessageTemplate message, String connName) throws JMSException {
 		if(message == null) {
 			message = new TextMessageTemplate();
 		}
-		return sendInternal(destinationName, message);
+		return sendInternal(connName, destinationName, message);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public int count(String destinationName, String selector) throws JMSException {
+	public int count(String destinationName, String selector, String connName) throws JMSException {
 		Connection conn = null;
 		Session session = null;
 		QueueBrowser browser = null;
 
 		try {
-			conn = createConnectionFactory().createConnection();
+			conn = createConnectionFactory(connName).createConnection();
 			conn.start();
 			session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			
 			if(selector != null) {
-				browser = session.createBrowser((Queue) createDestination(destinationName), selector);
+				browser = session.createBrowser((Queue) createDestination(session, destinationName), selector);
 			} else {
-				browser = session.createBrowser((Queue) createDestination(destinationName));
+				browser = session.createBrowser((Queue) createDestination(session, destinationName));
 			}
 			
 			Enumeration<Message> messages = browser.getEnumeration();
@@ -133,20 +135,20 @@ public class JMSService {
 		}
 	}
 
-	public void clean(String destinationName, String selector) throws JMSException {
+	public void clean(String destinationName, String selector, String connName) throws JMSException {
 		Connection conn = null;
 		Session session = null;
 		MessageConsumer consumer = null;
 
 		try {
-			conn = createConnectionFactory().createConnection();
+			conn = createConnectionFactory(connName).createConnection();
 			conn.start();
 			session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			
 			if(selector != null) {
-				consumer = session.createConsumer(createDestination(destinationName), selector);
+				consumer = session.createConsumer(createDestination(session, destinationName), selector);
 			} else {
-				consumer = session.createConsumer(createDestination(destinationName));
+				consumer = session.createConsumer(createDestination(session, destinationName));
 			}
 
 			while(consumer.receiveNoWait() != null);
