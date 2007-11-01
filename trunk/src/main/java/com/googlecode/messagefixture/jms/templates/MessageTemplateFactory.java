@@ -25,7 +25,6 @@ public class MessageTemplateFactory {
 		Enumeration<String> propNames = jmsMessage.getPropertyNames(); 
 		while(propNames.hasMoreElements()) {
 			String propName = propNames.nextElement();
-			
 			properties.put(propName, jmsMessage.getStringProperty(propName));
 		}
 		
