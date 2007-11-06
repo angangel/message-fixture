@@ -20,5 +20,8 @@ mvn install:install-file -DgroupId=mq -DartifactId=dhbcore -Dversion=6.0.2.0 -Dp
 mvn install:install-file -DgroupId=mq -DartifactId=com.ibm.mq.pcf -Dversion=6.0.3 -Dpackaging=jar -Dfile=com.ibm.mq.pcf-6.0.3.jar
 }}}
 
+= Eclipse setup =
+Since the WMB toolkit requires some special settings in the Eclipse files (.project and .classpath), we have included them in SVN. So, you should not run Maven to generate them.
+
 == Todo ==
 Include shell commands for Linux
