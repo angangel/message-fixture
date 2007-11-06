@@ -1,7 +1,6 @@
 package com.googlecode.messagefixture.mq;
 
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.Map;
 
 import net.servicefixture.ServiceFixtureException;
@@ -11,9 +10,12 @@ import com.googlecode.messagefixture.MessageConfiguration;
 import com.googlecode.messagefixture.mq.templates.BinaryMessageTemplate;
 import com.googlecode.messagefixture.mq.templates.MessageTemplate;
 import com.googlecode.messagefixture.mq.templates.TextMessageTemplate;
+import com.googlecode.messagefixture.mq.util.PcfException;
+import com.googlecode.messagefixture.mq.util.PcfUtil;
 import com.ibm.mq.MQC;
 import com.ibm.mq.MQEnvironment;
 import com.ibm.mq.MQException;
+import com.ibm.mq.MQGetMessageOptions;
 import com.ibm.mq.MQMessage;
 import com.ibm.mq.MQQueue;
 import com.ibm.mq.MQQueueManager;
@@ -127,6 +129,49 @@ public class MQService extends AbstractMessageService  {
 				throw e;
 			}
 		}
-		
 	}
+	
+	public void inhibit(String destinationName, String connName) throws MQException, IOException, PcfException {
+		MQQueueManager qm = createQM(connName);
+		
+		PcfUtil.putDisableQueue(qm, destinationName);
+		PcfUtil.getDisableQueue(qm, destinationName);
+	}
+
+	public void enable(String destinationName, String connName) throws MQException, IOException, PcfException {
+		MQQueueManager qm = createQM(connName);
+		
+		PcfUtil.putEnableQueue(qm, destinationName);
+		PcfUtil.getEnableQueue(qm, destinationName);
+	}
+	
+	public int count(String destinationName, String connName) throws MQException {
+		MQQueueManager qm = createQM(connName);
+		
+		int oo = MQC.MQOO_INPUT_SHARED + MQC.MQOO_BROWSE;
+		MQQueue queue = qm.accessQueue(destinationName, oo);
+
+		int count = 0;
+		try {
+			MQGetMessageOptions gmo = new MQGetMessageOptions();
+			gmo.options = MQC.MQGMO_BROWSE_FIRST;
+			while(true) {
+
+				MQMessage msg = new MQMessage();
+				queue.get(msg, gmo);
+				count++;
+				
+				gmo.options = MQC.MQGMO_BROWSE_NEXT;
+			}
+			
+		} catch(MQException e) {
+			if(e.reasonCode == 2033) {
+				// ok, we're done
+				return count;
+			} else {
+				throw e;
+			}
+		}
+	}
+	
 }
