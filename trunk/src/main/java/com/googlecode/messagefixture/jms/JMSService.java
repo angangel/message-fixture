@@ -1,11 +1,13 @@
+/*
+ * Copyright (C) 2007 by Callista Enterprise. All rights reserved.
+ * Released under the terms of the GNU General Public License version 2 or later.
+ */
+
 package com.googlecode.messagefixture.jms;
 
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -15,12 +17,7 @@ import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 
-import net.servicefixture.ServiceFixtureException;
-
-import org.apache.commons.beanutils.BeanUtils;
-
 import com.googlecode.messagefixture.AbstractMessageService;
-import com.googlecode.messagefixture.MessageConfiguration;
 import com.googlecode.messagefixture.jms.templates.MessageTemplate;
 import com.googlecode.messagefixture.jms.templates.MessageTemplateFactory;
 import com.googlecode.messagefixture.jms.templates.TextMessageTemplate;

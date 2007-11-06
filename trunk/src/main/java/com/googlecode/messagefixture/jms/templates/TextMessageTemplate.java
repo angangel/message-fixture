@@ -1,13 +1,15 @@
+/*
+ * Copyright (C) 2007 by Callista Enterprise. All rights reserved.
+ * Released under the terms of the GNU General Public License version 2 or later.
+ */
+
 package com.googlecode.messagefixture.jms.templates;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -20,8 +22,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.servicefixture.ServiceFixtureException;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
