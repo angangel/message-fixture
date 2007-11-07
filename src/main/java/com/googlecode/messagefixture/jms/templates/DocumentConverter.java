@@ -24,7 +24,7 @@ public class DocumentConverter {
 		Map<String, Map<String, Object>> rootMap = new HashMap<String, Map<String, Object>>();
 		
 		Element rootElm = doc.getDocumentElement();
-		rootMap.put(rootElm.getNodeName(), elementToMap(rootElm));
+		rootMap.put(escapeElementName(rootElm.getNodeName()), elementToMap(rootElm));
 		
 		return rootMap;
 	}
@@ -66,9 +66,9 @@ public class DocumentConverter {
 			List<Map<String, Object>> childList = entry.getValue();
 			
 			if(childList.size() > 1) {
-				elmMap.put(entry.getKey(), childList.toArray(new Map[0]));
+				elmMap.put(escapeElementName(entry.getKey()), childList.toArray(new Map[0]));
 			} else {
-				elmMap.put(entry.getKey(), childList.get(0));
+				elmMap.put(escapeElementName(entry.getKey()), childList.get(0));
 			}
 		}
 
@@ -85,5 +85,9 @@ public class DocumentConverter {
 		}
 		
 		return elmMap;
+	}
+	
+	private String escapeElementName(String elmName) {
+		return elmName.replace('-', '_');
 	}
 }
