@@ -87,7 +87,7 @@ public class MessageConfiguration {
 		if(dirPath != null) {
 			return new File(dirPath);
 		} else {
-			return new File("FitnesseRoot/files");
+			return new File("FitNesseRoot/files");
 		}
 	}
 }

@@ -7,6 +7,8 @@ package com.googlecode.messagefixture.mq.util;
 
 public class PcfException extends Exception {
 
+	private static final long serialVersionUID = 2219655344007019470L;
+
 	public PcfException() {
 		super();
 	}
