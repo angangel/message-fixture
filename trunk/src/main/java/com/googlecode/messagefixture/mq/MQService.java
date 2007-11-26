@@ -27,7 +27,7 @@ import com.ibm.mq.MQQueueManager;
 
 public class MQService extends AbstractMessageService  {
 
-	private MQQueueManager createQM(String connName) throws MQException {
+	private String initMqEnvironment(String connName) {
 		MessageConfiguration config = MessageConfiguration.getInstance();
 		
 		if(connName == null) {
@@ -45,17 +45,27 @@ public class MQService extends AbstractMessageService  {
 		
 		if(allProps.containsKey("hostName")) {
 			MQEnvironment.hostname = allProps.get("hostName");
+		} else {
+			MQEnvironment.hostname = null;
 		}
 		
 		if(allProps.containsKey("port")) {
 			MQEnvironment.port = Integer.parseInt(allProps.get("port"));
+		} else {
+			MQEnvironment.port = 1414;
 		}
 		
 		if(allProps.containsKey("channel")) {
 			MQEnvironment.channel = allProps.get("channel");
+		} else {
+			MQEnvironment.channel = null;
 		}
 		
-		MQQueueManager qm = new MQQueueManager(allProps.get("queueManager"));
+		return allProps.get("queueManager");
+	}
+	
+	private MQQueueManager createQM(String connName) throws MQException {
+		MQQueueManager qm = new MQQueueManager(initMqEnvironment(connName));
 		
 		return qm;
 	}
@@ -94,8 +104,13 @@ public class MQService extends AbstractMessageService  {
 		int oo = MQC.MQOO_INPUT_SHARED;
 		MQQueue queue = qm.accessQueue(destinationName, oo);
 		
+		MQGetMessageOptions gmo = new MQGetMessageOptions();
+		gmo.options = MQC.MQGMO_WAIT + MQC.MQGMO_CONVERT;
+		gmo.waitInterval = 10000;
+		
+		
 		MQMessage msg = new MQMessage();
-		queue.get(msg);
+		queue.get(msg, gmo);
 		
 		TextMessageTemplate message = new TextMessageTemplate(msg);
 		
@@ -176,6 +191,25 @@ public class MQService extends AbstractMessageService  {
 			} else {
 				throw e;
 			}
+		}
+	}
+
+	public void connect(String channelName, String connName) throws MQException, IOException {
+
+		String qmName = initMqEnvironment(connName);
+		MQEnvironment.channel = channelName;
+		
+		try {
+			MQQueueManager qm = new MQQueueManager(qmName);
+	
+			qm.getDescription();
+			
+			if(!qm.isConnected()) {
+				throw new ServiceFixtureException("Failed to connect");
+			}
+		} catch(MQException e) {
+			throw new ExtendedMQException(e);
+			
 		}
 	}
 	

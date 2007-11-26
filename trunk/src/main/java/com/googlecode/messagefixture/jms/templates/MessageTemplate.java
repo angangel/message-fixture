@@ -5,6 +5,7 @@
 
 package com.googlecode.messagefixture.jms.templates;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -53,7 +54,7 @@ public class MessageTemplate {
 		}
 	}
 	
-	public Message toMessage(Session session) throws JMSException {
+	public Message toMessage(Session session) throws JMSException, IOException {
 		Message message = session.createMessage();
 		populateMessage(message);
 		return message;
