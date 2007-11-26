@@ -5,6 +5,7 @@
 
 package com.googlecode.messagefixture.jms.templates;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -25,6 +26,9 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.googlecode.messagefixture.MessageConfiguration;
+import com.googlecode.messagefixture.util.IOUtil;
+
 public class TextMessageTemplate extends MessageTemplate {
 
 	public static final String LINEENDING_CRLF = "CRLF";
@@ -36,6 +40,7 @@ public class TextMessageTemplate extends MessageTemplate {
 
 	private String eol = LINEENDING_CRLF;
 	private String eom = LINEENDING_NONE;
+	private File msgFile;
 	private String text;
 	private List<String> lines = new ArrayList<String>();
 
@@ -84,11 +89,13 @@ public class TextMessageTemplate extends MessageTemplate {
 		}
 	}
 	
-	public Message toMessage(Session session) throws JMSException {
+	public Message toMessage(Session session) throws JMSException, IOException {
 		StringBuffer sb = new StringBuffer();
 		
 		if(text != null) {
 			sb.append(text);
+		} else if(msgFile != null) {
+			sb.append(IOUtil.readFull(msgFile));
 		} else {
 			for (int i = 0; i<lines.size(); i++) {
 				String line = lines.get(i);
@@ -121,5 +128,19 @@ public class TextMessageTemplate extends MessageTemplate {
 
 	public void setEom(String eom) {
 		this.eom = eom;
+	}
+
+	public String getFile() {
+		return msgFile.getAbsolutePath();
+	}
+
+	public void setFile(String filePath) {
+		File filesDir = MessageConfiguration.getInstance().getFilesDirectory();
+		this.msgFile = new File(filesDir, filePath);
+		
+		if(!msgFile.exists()) {
+			throw new ServiceFixtureException("File does not exists: " + msgFile.getAbsolutePath());
+		}
+
 	}
 }

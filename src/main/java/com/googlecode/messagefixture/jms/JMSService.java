@@ -5,6 +5,7 @@
 
 package com.googlecode.messagefixture.jms;
 
+import java.io.IOException;
 import java.util.Enumeration;
 
 import javax.jms.Connection;
@@ -60,11 +61,22 @@ public class JMSService extends AbstractMessageService {
 		} finally {
 			JMSUtils.closeQuitely(conn, session, consumer);
 		}
-		
-		
+	}
+	
+	public void connect(String connName) throws JMSException {
+		Connection conn = null;
+		Session session = null;
+
+		try {
+			conn = createConnectionFactory(connName).createConnection();
+			conn.start();
+			session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		} finally {
+			JMSUtils.closeQuitely(conn, session, (MessageConsumer)null);
+		}
 	}
 
-	private MessageTemplate sendInternal(String connName, String destinationName, MessageTemplate message) throws JMSException {
+	private MessageTemplate sendInternal(String connName, String destinationName, MessageTemplate message) throws JMSException, IOException {
 		Connection conn = null;
 		Session session = null;
 		MessageProducer producer = null;
@@ -87,14 +99,14 @@ public class JMSService extends AbstractMessageService {
 		}
 	}
 	
-	public MessageTemplate send(String destinationName, MessageTemplate message, String connName) throws JMSException {
+	public MessageTemplate send(String destinationName, MessageTemplate message, String connName) throws JMSException, IOException {
 		if(message == null) {
 			message = new MessageTemplate();
 		}
 		return sendInternal(connName, destinationName, message);
 	}
 
-	public MessageTemplate sendText(String destinationName, TextMessageTemplate message, String connName) throws JMSException {
+	public MessageTemplate sendText(String destinationName, TextMessageTemplate message, String connName) throws JMSException, IOException {
 		if(message == null) {
 			message = new TextMessageTemplate();
 		}
