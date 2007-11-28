@@ -174,6 +174,9 @@ public class MQService extends AbstractMessageService  {
 		int count = 0;
 		try {
 			MQGetMessageOptions gmo = new MQGetMessageOptions();
+			gmo.options = MQC.MQGMO_WAIT;
+			gmo.waitInterval = 10000;
+			
 			gmo.options = MQC.MQGMO_BROWSE_FIRST;
 			while(true) {
 
