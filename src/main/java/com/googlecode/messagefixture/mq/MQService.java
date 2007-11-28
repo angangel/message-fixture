@@ -124,7 +124,12 @@ public class MQService extends AbstractMessageService  {
 		MQQueue queue = qm.accessQueue(destinationName, oo);
 		
 		MQMessage msg = new MQMessage();
-		queue.get(msg);
+		
+		MQGetMessageOptions gmo = new MQGetMessageOptions();
+		gmo.options = MQC.MQGMO_WAIT + MQC.MQGMO_CONVERT;
+		gmo.waitInterval = 10000;
+		
+		queue.get(msg, gmo);
 		
 		BinaryMessageTemplate message = new BinaryMessageTemplate(msg);
 		
@@ -174,10 +179,9 @@ public class MQService extends AbstractMessageService  {
 		int count = 0;
 		try {
 			MQGetMessageOptions gmo = new MQGetMessageOptions();
-			gmo.options = MQC.MQGMO_WAIT;
+			gmo.options = MQC.MQGMO_WAIT + MQC.MQGMO_BROWSE_FIRST;
 			gmo.waitInterval = 10000;
 			
-			gmo.options = MQC.MQGMO_BROWSE_FIRST;
 			while(true) {
 
 				MQMessage msg = new MQMessage();
