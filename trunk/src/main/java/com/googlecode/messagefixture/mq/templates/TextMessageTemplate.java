@@ -45,4 +45,22 @@ public class TextMessageTemplate extends MessageTemplate {
 			return new byte[0];
 		}
 	}
+	
+	public boolean mask(String expected, String maskCharacter){
+		char maskChar = maskCharacter.charAt(0);
+		
+		if(expected.length()!=text.length())
+			return false;
+		
+		for(int pos=0;pos<text.length();pos++){
+			char c = expected.charAt(pos); 
+			if(c!=maskChar){
+				if(c!=text.charAt(pos)){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 }
