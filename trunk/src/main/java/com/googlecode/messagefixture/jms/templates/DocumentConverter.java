@@ -24,7 +24,7 @@ public class DocumentConverter {
 		Map<String, Map<String, Object>> rootMap = new HashMap<String, Map<String, Object>>();
 		
 		Element rootElm = doc.getDocumentElement();
-		rootMap.put(escapeElementName(rootElm.getNodeName()), elementToMap(rootElm));
+		rootMap.put(escapeElementName(rootElm.getLocalName()), elementToMap(rootElm));
 		
 		return rootMap;
 	}
@@ -42,7 +42,7 @@ public class DocumentConverter {
 			if(child instanceof Element) {
 				Element childElm = (Element) child;
 				
-				String name = child.getNodeName();
+				String name = child.getLocalName();
 				
 				List<Map<String, Object>> elmWithThisName;
 				if(childMappings.containsKey(name)) {
