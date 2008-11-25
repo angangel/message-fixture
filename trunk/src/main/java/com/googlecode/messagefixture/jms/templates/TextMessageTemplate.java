@@ -55,7 +55,7 @@ public class TextMessageTemplate extends MessageTemplate {
 	public Map getXml() throws SAXException, IOException, ParserConfigurationException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		// TODO revisit
-		dbf.setNamespaceAware(false);
+		dbf.setNamespaceAware(true);
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document doc = db.parse(new InputSource(new StringReader(text)));
 		
